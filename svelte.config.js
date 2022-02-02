@@ -1,16 +1,31 @@
-import adapter from '@sveltejs/adapter-auto';
+import preprocess from 'svelte-preprocess';
+import adapter from '@sveltejs/adapter-netlify';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
+	extensions: [".svelte"],
+
+	preprocess: [
+		preprocess({
+			postcss: true
+		})
+	],
 	kit: {
-		adapter: adapter(),
-
 		// hydrate the <div id="svelte"> element in src/app.html
+		adapter: adapter(),
 		target: '#svelte',
-
-		// Override http methods in the Todo forms
-		methodOverride: {
-			allowed: ['PATCH', 'DELETE']
+		vite: {
+			resolve: {
+				dedupe: ['svelte']
+			},
+			optimizeDeps: {
+				// exclude: Object.keys(pkg.dependencies || {}).filter((d) => !['graphql'].includes(d)),
+				include: ['graphql']
+			},
+			ssr: {
+				// Until https://github.com/vitejs/vite/issues/2579
+				// noExternal: Object.keys(pkg.dependencies || {})
+			}
 		}
 	}
 };
